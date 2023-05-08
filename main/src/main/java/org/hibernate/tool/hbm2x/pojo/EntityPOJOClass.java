@@ -396,7 +396,7 @@ public class EntityPOJOClass extends BasicPOJOClass {
 		while ( columns.hasNext() ) {
 			Selectable selectable = columns.next();
             Selectable referencedColumn = null;
-            if(referencedColumnsIterator!=null) {
+            if(referencedColumnsIterator!=null  && referencedColumnsIterator.hasNext()) {
             	referencedColumn = referencedColumnsIterator.next();
             }
 
