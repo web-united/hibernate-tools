@@ -18,6 +18,7 @@ import org.hibernate.internal.util.collections.JoinedIterator;
 import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Component;
+import org.hibernate.mapping.ForeignKey;
 import org.hibernate.mapping.Formula;
 import org.hibernate.mapping.KeyValue;
 import org.hibernate.mapping.ManyToOne;
@@ -352,10 +353,25 @@ public class EntityPOJOClass extends BasicPOJOClass {
 		}
 
 		if(property.getValue() instanceof ToOne) {
-			String referencedEntityName = ((ToOne)property.getValue()).getReferencedEntityName();
-			PersistentClass target = md.getEntityBinding(referencedEntityName);
-			if(target!=null) {
-				referencedColumnsIterator = target.getKey().getColumnIterator();
+			ForeignKey foreignKey = property.getValue().getTable().getForeignKeys().values().stream()
+					.filter(fk -> fk.getName().equals(property.getName())).findFirst().orElse(null);
+			if (foreignKey != null) {
+				referencedColumnsIterator = foreignKey.getReferencedColumns().iterator();
+			} else {
+				List<Selectable> propertySourceColumns = new ArrayList<>();
+				property.getValue().getColumnIterator().forEachRemaining(propertySourceColumns::add);
+
+				// If no property was found in the reveng file with the same constraint name, check the DB FKs.
+				foreignKey = property.getValue().getTable().getForeignKeys().values().stream()
+						.filter(fk ->
+							fk.getReferencedEntityName().equals(((ToOne) property.getValue()).getReferencedEntityName())
+							&& fk.getColumns().equals(propertySourceColumns)
+						)
+						.findFirst()
+						.orElse(null);
+				if (foreignKey != null) {
+					referencedColumnsIterator = foreignKey.getReferencedColumns().iterator();
+				}
 			}
 		}
 
@@ -380,7 +396,7 @@ public class EntityPOJOClass extends BasicPOJOClass {
 		while ( columns.hasNext() ) {
 			Selectable selectable = columns.next();
             Selectable referencedColumn = null;
-            if(referencedColumnsIterator!=null) {
+            if(referencedColumnsIterator!=null  && referencedColumnsIterator.hasNext()) {
             	referencedColumn = referencedColumnsIterator.next();
             }
 
