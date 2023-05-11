@@ -354,7 +354,7 @@ public class EntityPOJOClass extends BasicPOJOClass {
 
 		if(property.getValue() instanceof ToOne) {
 			ForeignKey foreignKey = property.getValue().getTable().getForeignKeys().values().stream()
-					.filter(fk -> fk.getName().equals(property.getName())).findFirst().orElse(null);
+					.filter(fk -> fk.getName().split("-")[0].equals(property.getName())).findFirst().orElse(null);
 			if (foreignKey != null) {
 				referencedColumnsIterator = foreignKey.getReferencedColumns().iterator();
 			} else {
