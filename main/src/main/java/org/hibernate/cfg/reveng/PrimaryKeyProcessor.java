@@ -3,6 +3,7 @@ package org.hibernate.cfg.reveng;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.hibernate.cfg.reveng.dialect.MetaDataDialect;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.mapping.Table;
+import org.hibernate.mapping.UniqueKey;
 import org.hibernate.sql.Alias;
 import org.jboss.logging.Logger;
 
@@ -44,6 +46,37 @@ public class PrimaryKeyProcessor {
 			}
 			table.setPrimaryKey(key);
 			t = new ArrayList<String>(userPrimaryKey);
+
+			// Create a temporary unique key for the original primary key which is going to become a unique constraint
+			// due to the primary key override
+			Iterator<Map<String, Object>> primaryKeys = metaDataDialect.getPrimaryKeys(getCatalogForDBLookup(
+					table.getCatalog(), defaultCatalog),
+					getSchemaForDBLookup(table.getSchema(), defaultSchema),
+					table.getName());
+			Map<String, UniqueKey> uniqueKeys = new HashMap<String, UniqueKey>();
+
+			while (primaryKeys.hasNext() ) {
+				Map<String, Object> primaryKeyRs = primaryKeys.next();
+				String indexName = (String) primaryKeyRs.get("PK_NAME");
+				String columnName = (String) primaryKeyRs.get("COLUMN_NAME");
+
+				UniqueKey uniqueKey = uniqueKeys.get(indexName);
+				if (uniqueKey==null) {
+					uniqueKey = new UniqueKey();
+					uniqueKey.setName("DWPK-" + indexName);
+					uniqueKey.setTable(table);
+					table.addUniqueKey(uniqueKey);
+					uniqueKeys.put(indexName, uniqueKey);
+
+					// Add a temporary column so that this unique constraint is different from the original primary key.
+					// This unique key with the temporary column will be deleted during index processing.
+					Column tempColumn = new Column("TEMP_COLUMN");
+					uniqueKey.addColumn(tempColumn);
+				}
+
+				Column column = getColumn(metaDataDialect, table, columnName);
+				uniqueKey.addColumn(column);
+			}
 		} else {
 			log.warn("Rev.eng. strategy did not report any primary key columns for " + table.getName() + ". Asking the JDBC driver");
 			try {

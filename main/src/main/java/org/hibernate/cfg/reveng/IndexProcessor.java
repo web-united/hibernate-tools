@@ -133,6 +133,22 @@ public class IndexProcessor {
 			// if only key matches then mark as setNaturalId(true);
 			iterator.next();
 		}
+
+		// Change the unique key name of the original primary key to contain the new 'DWPK-' prefix
+		// and delete the temp key
+		Iterator<UniqueKey> uniqueKeyIterator = table.getUniqueKeyIterator();
+		String originalPkName = "";
+		while(uniqueKeyIterator.hasNext()) {
+			UniqueKey uniqueKey = uniqueKeyIterator.next();
+			if (uniqueKey.getName().startsWith("DWPK-")) {
+				originalPkName = uniqueKey.getName().substring(5);
+				UniqueKey originalUk = uniquekeys.remove(originalPkName);
+				originalUk.setName(uniqueKey.getName());
+				uniquekeys.put(uniqueKey.getName(), originalUk);
+				uniqueKeyIterator.remove();
+				break;
+			}
+		}
 	}
 	
 	private static String getCatalogForDBLookup(String catalog, String defaultCatalog) {
