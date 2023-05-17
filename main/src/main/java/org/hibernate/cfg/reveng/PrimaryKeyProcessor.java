@@ -56,9 +56,9 @@ public class PrimaryKeyProcessor {
 			Map<String, UniqueKey> uniqueKeys = new HashMap<String, UniqueKey>();
 
 			while (primaryKeys.hasNext() ) {
-				Map<String, Object> primaryKeyRsTest = primaryKeys.next();
-				String indexName = (String) primaryKeyRsTest.get("PK_NAME");
-				String columnName = (String) primaryKeyRsTest.get("COLUMN_NAME");
+				Map<String, Object> primaryKeyRs = primaryKeys.next();
+				String indexName = (String) primaryKeyRs.get("PK_NAME");
+				String columnName = (String) primaryKeyRs.get("COLUMN_NAME");
 
 				UniqueKey uniqueKey = uniqueKeys.get(indexName);
 				if (uniqueKey==null) {
@@ -68,7 +68,8 @@ public class PrimaryKeyProcessor {
 					table.addUniqueKey(uniqueKey);
 					uniqueKeys.put(indexName, uniqueKey);
 
-					// Add a temporary column so that this unique constraint is different from the original primary key
+					// Add a temporary column so that this unique constraint is different from the original primary key.
+					// This unique key with the temporary column will be deleted during index processing.
 					Column tempColumn = new Column("TEMP_COLUMN");
 					uniqueKey.addColumn(tempColumn);
 				}
