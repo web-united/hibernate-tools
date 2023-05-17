@@ -134,14 +134,14 @@ public class IndexProcessor {
 			iterator.next();
 		}
 
-		// Change the unique key name of the original primary key to contain the new 'PK-' prefix
+		// Change the unique key name of the original primary key to contain the new 'DWPK-' prefix
 		// and delete the temp key
 		Iterator<UniqueKey> uniqueKeyIterator = table.getUniqueKeyIterator();
 		String originalPkName = "";
 		while(uniqueKeyIterator.hasNext()) {
 			UniqueKey uniqueKey = uniqueKeyIterator.next();
-			if (uniqueKey.getName().startsWith("PK-")) {
-				originalPkName = uniqueKey.getName().substring(3);
+			if (uniqueKey.getName().startsWith("DWPK-")) {
+				originalPkName = uniqueKey.getName().substring(5);
 				UniqueKey originalUk = uniquekeys.remove(originalPkName);
 				originalUk.setName(uniqueKey.getName());
 				uniquekeys.put(uniqueKey.getName(), originalUk);

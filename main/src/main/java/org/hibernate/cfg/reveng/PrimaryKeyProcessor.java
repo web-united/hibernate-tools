@@ -63,7 +63,7 @@ public class PrimaryKeyProcessor {
 				UniqueKey uniqueKey = uniqueKeys.get(indexName);
 				if (uniqueKey==null) {
 					uniqueKey = new UniqueKey();
-					uniqueKey.setName("PK-" + indexName);
+					uniqueKey.setName("DWPK-" + indexName);
 					uniqueKey.setTable(table);
 					table.addUniqueKey(uniqueKey);
 					uniqueKeys.put(indexName, uniqueKey);
