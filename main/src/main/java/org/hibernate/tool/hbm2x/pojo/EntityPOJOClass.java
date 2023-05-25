@@ -382,7 +382,7 @@ public class EntityPOJOClass extends BasicPOJOClass {
 		}
 		else {
 			Iterator<Selectable> columns = columnIterator;
-			annotations.append("@").append( importType("javax.persistence.JoinColumns") ).append("( { " );
+			annotations.append("@").append( importType("javax.persistence.JoinColumns") ).append("({ " );
 			buildArrayOfJoinColumnAnnotation( columns, referencedColumnsIterator, annotations, insertable, updatable );
 			annotations.append( " } )" );
 		}

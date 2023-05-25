@@ -350,7 +350,7 @@ abstract public class BasicPOJOClass implements POJOClass, MetaAttributeConstant
 		boolean insertable = property.isInsertable();
 		boolean updatable = property.isUpdateable();
 		if ( property.isComposite() ) {
-			annotations.append( "@" + importType("javax.persistence.AttributeOverrides") +"( {" );
+			annotations.append( "@" + importType("javax.persistence.AttributeOverrides") +"({" );
 			Component component = (Component) property.getValue();
 			Iterator<?> subElements = component.getPropertyIterator();
 			buildRecursiveAttributeOverride( subElements, null, property, annotations );
