@@ -708,7 +708,8 @@ public class EntityPOJOClass extends BasicPOJOClass {
 		while ( ! isOtherSide && properties.hasNext() ) {
 			Property manyProperty = (Property) properties.next();
 			Value manyValue = manyProperty.getValue();
-			if ( manyValue != null && manyValue instanceof ManyToOne ) {
+			if ( manyValue != null && manyValue instanceof ManyToOne
+				&& ((ManyToOne) manyValue).getReferencedEntityName().equals(collection.getOwner().getEntityName())) {
 				if ( joinColumns.size() == manyValue.getColumnSpan() ) {
 					isOtherSide = true;
 					Iterator<?> it = manyValue.getColumnIterator();
