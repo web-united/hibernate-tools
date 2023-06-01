@@ -50,23 +50,12 @@ public class ForeignKeysInfo {
 				String keyDef = fk.toString();
 				String colsDef = keyDef.substring(keyDef.indexOf("ForeignKeyKey{columns=[")+23,
 						keyDef.indexOf("], referencedClassName='"));
-				String[] colsStr = colsDef.split("\\s*,\\s*");
-				List<Column> cols = new ArrayList<>();
-				for (String col: colsStr) {
-					String colName = col.substring(col.indexOf("org.hibernate.mapping.Column(")+29, col.length()-1);
-					cols.add(new Column(colName));
-				}
+				List<Column> cols = createColumnList(colsDef);
 				String classDef = keyDef.substring(keyDef.indexOf(", referencedClassName='")+23,
 						keyDef.indexOf("', referencedColumns="));
 				String refColsDef = keyDef.substring(keyDef.indexOf("', referencedColumns=[")+22,
 						keyDef.length()-2);
-				String[] refColsStr = refColsDef.split("\\s*,\\s*");
-				List<Column> refCols = new ArrayList<>();
-				for (String refCol: refColsStr) {
-					String refColName = refCol.substring(refCol.indexOf("org.hibernate.mapping.Column(")+29,
-							refCol.length()-1);
-					refCols.add(new Column(refColName));
-				}
+				List<Column> refCols = createColumnList(refColsDef);
 
 				return columns.equals(cols) && refColumns.equals(refCols) && !className.equals(classDef);
 			});
@@ -86,6 +75,16 @@ public class ForeignKeysInfo {
 			addToMultiMap(oneToManyCandidates, className, key);				
 		}
 		return oneToManyCandidates;
+	}
+
+	private List<Column> createColumnList(String columnDef) {
+		String[] colsStr = columnDef.split("\\s*,\\s*");
+		List<Column> cols = new ArrayList<>();
+		for (String col: colsStr) {
+			String colName = col.substring(col.indexOf("org.hibernate.mapping.Column(")+29, col.length()-1);
+			cols.add(new Column(colName));
+		}
+		return cols;
 	}
 
 	private void addToMultiMap(Map<String, List<ForeignKey>> multimap, String key, ForeignKey item) {
