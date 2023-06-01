@@ -41,12 +41,50 @@ public class ForeignKeysInfo {
 			
 			String className = revengStrategy.tableToClassName(TableIdentifier.create(referencedTable) );
 
-			ForeignKey key = fkTable.createForeignKey(fkName, columns, className, null, refColumns);			
+			// ForeignKeyKey matches only by columns and referenced columns without considering the referenced class
+			// name. Added a boolean to check if there exists a foreign key where the columns and referenced columns
+			// match, but the referenced class name is different. In this case add a temporary column to the actual
+			// foreign key so that hibernate sees this as a different key, then remove it once hibernate returns
+			// the newly created key.
+			boolean differentTargetFound = fkTable.getForeignKeys().keySet().stream().anyMatch(fk -> {
+				String keyDef = fk.toString();
+				String colsDef = keyDef.substring(keyDef.indexOf("ForeignKeyKey{columns=[")+23,
+						keyDef.indexOf("], referencedClassName='"));
+				List<Column> cols = createColumnList(colsDef);
+				String classDef = keyDef.substring(keyDef.indexOf(", referencedClassName='")+23,
+						keyDef.indexOf("', referencedColumns="));
+				String refColsDef = keyDef.substring(keyDef.indexOf("', referencedColumns=[")+22,
+						keyDef.length()-2);
+				List<Column> refCols = createColumnList(refColsDef);
+
+				return columns.equals(cols) && refColumns.equals(refCols) && !className.equals(classDef);
+			});
+
+			Column tempColumn = new Column("TEMP_COLUMN");
+			if (differentTargetFound) {
+				refColumns.add(tempColumn);
+			}
+
+			ForeignKey key = fkTable.createForeignKey(fkName, columns, className, null, refColumns);
 			key.setReferencedTable(referencedTable);
+
+			if (differentTargetFound) {
+				key.getReferencedColumns().remove(tempColumn);
+			}
 
 			addToMultiMap(oneToManyCandidates, className, key);				
 		}
 		return oneToManyCandidates;
+	}
+
+	private List<Column> createColumnList(String columnDef) {
+		String[] colsStr = columnDef.split("\\s*,\\s*");
+		List<Column> cols = new ArrayList<>();
+		for (String col: colsStr) {
+			String colName = col.substring(col.indexOf("org.hibernate.mapping.Column(")+29, col.length()-1);
+			cols.add(new Column(colName));
+		}
+		return cols;
 	}
 
 	private void addToMultiMap(Map<String, List<ForeignKey>> multimap, String key, ForeignKey item) {
