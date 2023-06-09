@@ -1,5 +1,6 @@
 package org.hibernate.cfg.reveng;
 
+import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -167,11 +168,40 @@ public class PrimaryKeyProcessor {
 				String name = (String) cols.next();
 				// should get column from table if it already exists!
 				Column col = getColumn(metaDataDialect, table, name);
+				// if the sql type code is null (e.g. for excluded columns), populate it.
+				if (col.getSqlTypeCode() == null) {
+					updateColumnInfo(metaDataDialect, defaultSchema, defaultCatalog, col, table, name);
+				}
 				key.addColumn(col);
 			}
 			log.debug("primary key for " + table + " -> "  + key);
 		}
 
+	}
+
+	private static void updateColumnInfo(MetaDataDialect metaDataDialect, String defaultSchema, String defaultCatalog,
+										 Column col, Table table, String name) {
+		Iterator<?> columnIterator = metaDataDialect.getColumns(
+				getCatalogForDBLookup(table.getCatalog(), defaultCatalog),
+				getSchemaForDBLookup(table.getSchema(), defaultSchema),
+				table.getName(),
+				name);
+
+		if (columnIterator.hasNext()) {
+			Map<?, ?> columnRs = (Map<?, ?>) columnIterator.next();
+
+			int sqlTypeCode = ((Integer)columnRs.get("DATA_TYPE")).intValue();
+			int size = ((Integer)columnRs.get("COLUMN_SIZE")).intValue();
+			int dbNullability = ((Integer)columnRs.get("NULLABLE")).intValue();
+
+			boolean isNullable = dbNullability != DatabaseMetaData.columnNoNulls;
+
+			col.setSqlTypeCode(sqlTypeCode);
+			if (size>=0 && size!=Integer.MAX_VALUE && JDBCToHibernateTypeHelper.typeHasLength(sqlTypeCode)) {
+				col.setLength(size);
+			}
+			col.setNullable(isNullable);
+		}
 	}
 
 	private static String getCatalogForDBLookup(String catalog, String defaultCatalog) {
