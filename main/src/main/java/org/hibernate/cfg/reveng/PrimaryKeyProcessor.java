@@ -181,18 +181,18 @@ public class PrimaryKeyProcessor {
 
 	private static void updateColumnInfo(MetaDataDialect metaDataDialect, String defaultSchema, String defaultCatalog,
 										 Column col, Table table, String name) {
-		Iterator<?> columnIterator = metaDataDialect.getColumns(
+		Iterator<Map<String, Object>> columnIterator = metaDataDialect.getColumns(
 				getCatalogForDBLookup(table.getCatalog(), defaultCatalog),
 				getSchemaForDBLookup(table.getSchema(), defaultSchema),
 				table.getName(),
 				name);
 
 		if (columnIterator.hasNext()) {
-			Map<?, ?> columnRs = (Map<?, ?>) columnIterator.next();
+			Map<String, Object> columnRs = columnIterator.next();
 
-			int sqlTypeCode = ((Integer)columnRs.get("DATA_TYPE")).intValue();
-			int size = ((Integer)columnRs.get("COLUMN_SIZE")).intValue();
-			int dbNullability = ((Integer)columnRs.get("NULLABLE")).intValue();
+			int sqlTypeCode = (Integer) columnRs.get("DATA_TYPE");
+			int size = (Integer) columnRs.get("COLUMN_SIZE");
+			int dbNullability = (Integer) columnRs.get("NULLABLE");
 
 			boolean isNullable = dbNullability != DatabaseMetaData.columnNoNulls;
 
