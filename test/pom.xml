@@ -30,7 +30,7 @@
     			<module>nodb</module>
     			<module>common</module>
 				<module>maven-plugin</module>
-				<module>h2</module>
+				<!-- <module>h2</module> -->
 				<module>hsql</module>
 				<module>mssql</module>
 				<module>oracle</module>
@@ -47,7 +47,7 @@
             	<module>nodb</module>
             	<module>common</module>
 				<module>maven-plugin</module>
-            	<module>h2</module>
+            	<!-- <module>h2</module> -->
           	</modules> 
        	</profile>
          <profile>
