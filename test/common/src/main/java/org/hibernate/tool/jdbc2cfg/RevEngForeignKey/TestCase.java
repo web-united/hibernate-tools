@@ -67,14 +67,14 @@ public class TestCase {
 		PersistentClass project = metadata.getEntityBinding("Project");
 		assertNotNull(project.getProperty("worksOns"));
 		assertNotNull(project.getProperty("employee"));
-		assertEquals(3, project.getPropertyClosureSpan());		
+		assertEquals(4, project.getPropertyClosureSpan());
 		assertEquals("projectId", project.getIdentifierProperty().getName());
 		PersistentClass employee = metadata.getEntityBinding("Employee");
 		assertNotNull(employee.getProperty("worksOns"));
 		assertNotNull(employee.getProperty("employees"));
 		assertNotNull(employee.getProperty("employee"));
 		assertNotNull(employee.getProperty("projects"));
-		assertEquals(5, employee.getPropertyClosureSpan());
+		assertEquals(6, employee.getPropertyClosureSpan());
 		assertEquals("id", employee.getIdentifierProperty().getName());
 		PersistentClass worksOn = metadata.getEntityBinding("WorksOn");
 		assertNotNull(worksOn.getProperty("project"));
@@ -106,7 +106,7 @@ public class TestCase {
 		Property setProperty = employee.getProperty("managedProjects");
 		assertNotNull(setProperty);
 		assertEquals("delete, update", setProperty.getCascade());
-		assertEquals(4, employee.getPropertyClosureSpan());
+		assertEquals(5, employee.getPropertyClosureSpan());
 		assertEquals("id", employee.getIdentifierProperty().getName());
 		PersistentClass worksOn = metadata.getEntityBinding("WorksOn");
 		assertNotNull(worksOn.getProperty("project"));

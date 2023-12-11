@@ -87,7 +87,7 @@ public class TestCase {
 		assertNotNull(classMapping);		
 		KeyValue identifier = classMapping.getIdentifier();
 		assertNotNull(identifier);	
-		assertEquals(3,classMapping.getPropertyClosureSpan() );	
+		assertEquals(5,classMapping.getPropertyClosureSpan() );
 		Property property = classMapping.getProperty("ordersByRelatedOrderId");		
 		assertNotNull(property);	
 		property = classMapping.getProperty("ordersByOrderId");		

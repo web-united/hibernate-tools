@@ -307,7 +307,6 @@ public class JDBCBinder {
             Column fkcolumn = (Column) columns.next();
             checkColumn(fkcolumn);
             value.addColumn(fkcolumn);
-            processedColumns.add(fkcolumn);
         }
 
         value.setFetchMode(FetchMode.SELECT);
@@ -340,7 +339,6 @@ public class JDBCBinder {
 			Column fkcolumn = (Column) columns.next();
             checkColumn(fkcolumn);
             value.addColumn(fkcolumn);
-            processedColumns.add(fkcolumn);
 		}
         value.setFetchMode(FetchMode.SELECT);
 

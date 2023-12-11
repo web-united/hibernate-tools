@@ -84,7 +84,7 @@ public class TestCase {
 		assertNotNull(employee.getProperty("employees"));
 		assertNotNull(employee.getProperty("employee"));
 		//assertNotNull(employee.getProperty("projects"));
-		assertEquals(6, employee.getPropertyClosureSpan());
+		assertEquals(7, employee.getPropertyClosureSpan());
 		assertEquals("id", employee.getIdentifierProperty().getName());
 		
 		PersistentClass worksOn = metadata.getEntityBinding("WorksOn");
