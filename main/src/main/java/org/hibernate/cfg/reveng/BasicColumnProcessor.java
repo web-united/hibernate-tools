@@ -37,7 +37,7 @@ public class BasicColumnProcessor {
 				columnRs = (Map<?, ?>) columnIterator.next();
 				String tableName = (String) columnRs.get("TABLE_NAME");
 				int sqlType = ((Integer)columnRs.get("DATA_TYPE")).intValue();
-				//String sqlTypeName = (String) columnRs.get("TYPE_NAME");
+				String sqlTypeName = (String) columnRs.get("TYPE_NAME");
 				String columnName = (String) columnRs.get("COLUMN_NAME");
 				String comment = (String) columnRs.get("REMARKS");
 				
@@ -78,7 +78,7 @@ public class BasicColumnProcessor {
 				}
 								
 				//TODO: column.setSqlType(sqlTypeName); //this does not work 'cos the precision/scale/length are not retured in TYPE_NAME
-				//column.setSqlType(sqlTypeName);
+				column.setSqlType(sqlTypeName);
 				column.setComment(comment);
 				column.setSqlTypeCode(new Integer(sqlType) );
                 if(intBounds(size) ) {
