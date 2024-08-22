@@ -466,11 +466,13 @@ abstract public class BasicPOJOClass implements POJOClass, MetaAttributeConstant
 		if(!updatable) {
 				annotations.append( ", updatable=" ).append( updatable );
 		}
-		
+
+		/*
 		String sqlType = column.getSqlType();
 		if ( StringHelper.isNotEmpty( sqlType ) ) {
 			annotations.append( ", columnDefinition=\"" ).append( sqlType ).append( "\"" );
 		}
+		*/
 				
 	}
 
